@@ -1,2 +1,2 @@
 # django-app-template
-Django application template
+Django应用模板
