@@ -1,0 +1,13 @@
+from django.urls import path
+
+from . import views
+
+
+app_name = '{{ app_name }}'
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('', views.create, name='create'),
+    path('<int:id>', views.detail, name='detail'),
+    path('<int:id>', views.update, name='update'),
+    path('<int:id>', views.delete, name='delete'),
+]
