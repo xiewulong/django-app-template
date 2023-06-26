@@ -28,13 +28,13 @@ class UsersView(View):
 class UserView(View):
 
     def get(self, request, id):
-        return HttpResponse('Get user')
+        return HttpResponse(f'Get user {id}')
 
     def patch(self, request, id):
-        return HttpResponse('Update(patch) user')
+        return HttpResponse(f'Update(patch) user {id}')
 
     def put(self, request, id):
-        return HttpResponse('Update(put) user')
+        return HttpResponse(f'Update(put) user {id}')
 
     def delete(self, request, id):
-        return HttpResponse('Delete user')
+        return HttpResponse(f'Delete user {id}')
