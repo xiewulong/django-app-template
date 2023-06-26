@@ -16,25 +16,25 @@ def index(request):
     return HttpResponse('Index')
 
 @method_decorator(csrf_exempt, name = 'dispatch')
-class PollsView(View):
+class UsersView(View):
 
     def get(self, request):
-        return HttpResponse('Get polls')
+        return HttpResponse('Get users')
 
     def post(self, request):
-        return HttpResponse('Create poll')
+        return HttpResponse('Create user')
 
 @method_decorator(csrf_exempt, name = 'dispatch')
-class PollView(View):
+class UserView(View):
 
     def get(self, request, id):
-        return HttpResponse('Get poll')
+        return HttpResponse('Get user')
 
     def patch(self, request, id):
-        return HttpResponse('Update(patch) poll')
+        return HttpResponse('Update(patch) user')
 
     def put(self, request, id):
-        return HttpResponse('Update(put) poll')
+        return HttpResponse('Update(put) user')
 
     def delete(self, request, id):
-        return HttpResponse('Delete poll')
+        return HttpResponse('Delete user')

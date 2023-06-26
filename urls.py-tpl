@@ -6,6 +6,6 @@ from . import views
 app_name = '{{ app_name }}'
 urlpatterns = [
     path('', views.index, name='index'),
-    path('polls/', views.PollsView.as_view(), name='polls'),
-    path('polls/<int:id>', views.PollView.as_view(), name='poll'),
+    path('users/', views.UsersView.as_view(), name='users'),
+    path('users/<int:id>', views.UserView.as_view(), name='user'),
 ]
