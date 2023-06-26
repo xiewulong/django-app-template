@@ -1,7 +1,10 @@
 # import logging
 
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.views.generic import View
 
 
 # logger = logging.getLogger(__name__)
@@ -10,20 +13,28 @@ from django.views.decorators.http import require_http_methods
 def index(request):
     # logger.warning('Warning')
     # logger.info('Info')
-    return HttpResponse('List')
+    return HttpResponse('Index')
 
-@require_http_methods(['POST'])
-def create(request):
-    return HttpResponse('Create')
+@method_decorator(csrf_exempt, name = 'dispatch')
+class PollsView(View):
 
-@require_http_methods(['GET'])
-def detail(request, id):
-    return HttpResponse(f'Query {id}')
+    def get(self, request):
+        return HttpResponse('Get polls')
 
-@require_http_methods(['PATCH', 'PUT'])
-def update(request, id):
-    return HttpResponse(f'Update {id}')
+    def post(self, request):
+        return HttpResponse('Create poll')
 
-@require_http_methods(['DELETE'])
-def delete(request, id):
-    return HttpResponse(f'Delete {id}')
+@method_decorator(csrf_exempt, name = 'dispatch')
+class PollView(View):
+
+    def get(self, request, id):
+        return HttpResponse('Get poll')
+
+    def patch(self, request, id):
+        return HttpResponse('Update(patch) poll')
+
+    def put(self, request, id):
+        return HttpResponse('Update(put) poll')
+
+    def delete(self, request, id):
+        return HttpResponse('Delete poll')
