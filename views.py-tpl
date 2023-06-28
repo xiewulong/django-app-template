@@ -35,7 +35,6 @@ class UsersView(View):
         user.save()
         return user
 
-
 @method_decorator(csrf_exempt, name = 'dispatch')
 class UserView(View):
 
@@ -44,10 +43,12 @@ class UserView(View):
         user = get_object_or_404(User, id = id)
         return user
 
+    @simple_request
     @simple_response
     def patch(self, request, id):
         return f'Update(patch) user {id}'
 
+    @simple_request
     @simple_response
     def put(self, request, id):
         return f'Update(put) user {id}'

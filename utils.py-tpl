@@ -10,65 +10,66 @@ def instance_to_dict(instance):
     return dict((key, instance.__dict__[key]) for key in instance.__dict__ if not key.startswith('_'))
 
 
+def _simple_request_handler(request):
+    if not hasattr(request, 'body_json'):
+        if request.content_type == 'application/json':
+            request.body_json = json.loads(request.body.decode())
+
+def _simple_response_handler(response):
+    _kwargs = {}
+    _kwargs_keys = ('content_type', 'status', 'reason', 'charset', 'headers')
+
+    if isinstance(response, tuple):
+        response, *_args = response
+        _kwargs = dict((_kwargs_keys[i], _args[i]) for i in range(len(_args)) if not _args[i] is None)
+
+    if isinstance(response, int):
+        response = str(response)
+
+    if isinstance(response, str):
+        return HttpResponse(response, **_kwargs)
+
+    if isinstance(response, Model):
+        response = instance_to_dict(response)
+
+    if isinstance(response, dict):
+        return JsonResponse(response, **_kwargs)
+
+    if isinstance(response, QuerySet):
+        response = list(response.values())
+
+    if isinstance(response, list):
+        return JsonResponse(response, safe = False, **_kwargs)
+
+    return response
+
+
 def simple_request(func):
 
     def decorator(*args, **kwargs):
-
-        request = args[0] if isinstance(args[0], HttpRequest) else args[1]
-
-        if not hasattr(request, 'body_json'):
-            if request.content_type == 'application/json':
-                request.body_json = json.loads(request.body.decode())
-
+        _simple_request_handler(args[0] if isinstance(args[0], HttpRequest) else args[1])
         return func(*args, **kwargs)
 
     return decorator
 
-
 def simple_response(func):
 
     def decorator(*args, **kwargs):
-        res = func(*args, **kwargs)
-        _kwargs = {}
-        _kwargs_keys = ('content_type', 'status', 'reason', 'charset', 'headers')
-
-        if isinstance(res, tuple):
-            res, *_args = res
-            _kwargs = dict((_kwargs_keys[i], _args[i]) for i in range(len(_args)) if not _args[i] is None)
-
-        if isinstance(res, int):
-            res = str(res)
-
-        if isinstance(res, str):
-            return HttpResponse(res, **_kwargs)
-
-        if isinstance(res, Model):
-            res = instance_to_dict(res)
-
-        if isinstance(res, dict):
-            return JsonResponse(res, **_kwargs)
-
-        if isinstance(res, QuerySet):
-            res = list(res.values())
-
-        if isinstance(res, list):
-            return JsonResponse(res, safe = False, **_kwargs)
-
-        return res
+        return _simple_response_handler(func(*args, **kwargs))
 
     return decorator
+
+
+class SimpleReMiddleware(MiddlewareMixin):
+
+    def process_request(self, request):
+        _simple_request_handler(request)
+
+    def process_response(self, request, response):
+        return _simple_response_handler(response)
 
 
 class ModelUtilsMixin:
 
     def to_dict(self):
         return instance_to_dict(self)
-
-
-class SimpleReMiddleware(MiddlewareMixin):
-
-    def process_request(self, request):
-        pass
-
-    def process_response(self, request, response):
-        return response
