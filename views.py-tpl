@@ -1,40 +1,52 @@
 # import logging
 
-from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 
+from .models import User
+from .utils import simple_response
+
 
 # logger = logging.getLogger(__name__)
 
 @require_http_methods(['GET'])
+@simple_response
 def index(request):
     # logger.warning('Warning')
     # logger.info('Info')
-    return HttpResponse('Index')
+    return 'Index'
 
 @method_decorator(csrf_exempt, name = 'dispatch')
 class UsersView(View):
 
+    @simple_response
     def get(self, request):
-        return HttpResponse('Get users')
+        users = User.objects.all()[:20]
+        return users
 
+    @simple_response
     def post(self, request):
-        return HttpResponse('Create user')
+        user = User(name = '1', age = 20)
+        return user
 
 @method_decorator(csrf_exempt, name = 'dispatch')
 class UserView(View):
 
+    @simple_response
     def get(self, request, id):
-        return HttpResponse(f'Get user {id}')
+        user = User.objects.get(pk=id)
+        return user
 
+    @simple_response
     def patch(self, request, id):
-        return HttpResponse(f'Update(patch) user {id}')
+        return f'Update(patch) user {id}'
 
+    @simple_response
     def put(self, request, id):
-        return HttpResponse(f'Update(put) user {id}')
+        return f'Update(put) user {id}'
 
+    @simple_response
     def delete(self, request, id):
-        return HttpResponse(f'Delete user {id}')
+        return f'Delete user {id}'

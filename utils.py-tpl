@@ -1,0 +1,45 @@
+from django.db.models import Model
+from django.db.models.query import QuerySet
+from django.http import HttpResponse, JsonResponse
+
+
+def instance_to_dict(instance):
+    return dict((key, instance.__dict__[key]) for key in instance.__dict__ if not key.startswith('_'))
+
+class ModelUtilsMixin:
+
+    def to_dict(self):
+        return instance_to_dict(self)
+
+def simple_response(func):
+
+    def decorator(*args, **kwargs):
+        res = func(*args, **kwargs)
+        _kwargs = {}
+        _kwargs_keys = ('content_type', 'status', 'reason', 'charset', 'headers')
+
+        if isinstance(res, tuple):
+            res, *_args = res
+            _kwargs = dict((_kwargs_keys[i], _args[i]) for i in range(len(_args)) if not _args[i] is None)
+
+        if isinstance(res, int):
+            res = str(res)
+
+        if isinstance(res, str):
+            return HttpResponse(res, **_kwargs)
+
+        if isinstance(res, Model):
+            res = instance_to_dict(res)
+
+        if isinstance(res, dict):
+            return JsonResponse(res, **_kwargs)
+
+        if isinstance(res, QuerySet):
+            res = list(res.values())
+
+        if isinstance(res, list):
+            return JsonResponse(res, safe = False, **_kwargs)
+
+        return res
+
+    return decorator
