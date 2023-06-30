@@ -14,7 +14,7 @@ from .utils import simple_request, simple_response
 
 @require_http_methods(['GET'])
 @simple_response
-def index(request):
+def index(request, _):
     # logger.warning('Warning')
     # logger.info('Info')
     return 'Index'
